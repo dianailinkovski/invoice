@@ -25,6 +25,15 @@ export function getPortugeDigit(digit)
     const number = parseFloat(digit).toLocaleString("de-DE");
     return number;
 }
+
+export function getCNFDigit(value) {
+    let c = '0123456789';
+    function check(x) {
+        return c.includes(x) ? true : false;
+    }
+    let matches = [...value].reduce((x, y) => check(y) ? x + y : x, '');
+    return matches;
+}
 export function getLocalStorage()
 {
     let storage = {};

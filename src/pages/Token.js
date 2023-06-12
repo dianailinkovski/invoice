@@ -30,32 +30,17 @@ const Token = () => {
             spinner = false;
             toast.error('Ocorreu um erro');
         })
-
-        return() => {
-            clearLocalStorage();
-        }
-    })
+    },[
+        
+    ])
     const handleSubmit = () => {
         // call api
         if(loading)
         {
-            spinner = true;
-            axios.get('https://api.fale.net.br/customer/invoice', {
-                params: {doc: iInfo.CNF, invoice: iInfo.invoice, token: code}
-            })
-            .then(response => {console.log(response);
-                spinner = false;
-                clearLocalStorage();
+            clearLocalStorage();
+            window.open(`https://api.fale.net.br/customer/invoice?doc=${iInfo.CNF}&invoice=${iInfo.invoice}&token=${code}`, "_blank")
 
-                window.location.replace('https://www.google.com');
-                // redirect
-            })
-            .catch(error => {
-                spinner = false;
-                toast.error('Ocorreu um erro');
-                
-            })
-            //window.location ='/';
+            window.location = '/';
         }
         else
             toast.info('Por favor, insira.');
@@ -78,7 +63,6 @@ const Token = () => {
                                 <Col md="10">
                                 <InputCode
                                     length={6}
-                                    loading={loading}
                                     onComplete={code => {
                                         setCode(code);
                                         setLoading(true);

@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useNavigate } from 'react-router-dom';
 
-import { setLocalStorageCNF } from '../utility/helper';
+import { setLocalStorageCNF, getCNFDigit } from '../utility/helper';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import '../App.css';
@@ -15,13 +15,10 @@ import logo from '../assets/logo.png';
 
 const Home = () => {
     const [validated, setValidated] = useState(false);
-    const [cnf, setCnf] = useState('');
     const [spinner, setSpinner] = useState(false);
+    const [cpfCnpj, setcpfCnpjValue] = useState("");
     const navigate = useNavigate();
 
-    useEffect(() => {
-        setCnf('48310534000140');
-    })
     const handleSubmit = (event) => {
         const form = event.currentTarget;
 
@@ -31,11 +28,11 @@ const Home = () => {
             // call API
             setSpinner(true);
             axios.get('https://api.fale.net.br/customer/invoices', {
-                    params: {doc: cnf}
+                    params: {doc: getCNFDigit(cpfCnpj)}
                 })
                 .then(response => {
                     setSpinner(false);
-                    setLocalStorageCNF(cnf);
+                    setLocalStorageCNF(getCNFDigit(cpfCnpj));
                     //localStorage.setItem('CNF', cnf);
                     
                     navigate("/invoice",{ state: { invInfo:  response.data} });
@@ -48,6 +45,37 @@ const Home = () => {
         }
         setValidated(true);
     }
+    const handleCpfCnpjChange = (event) => {
+        // Get only the numbers from the data input
+        let data = event.target.value.replace(/\D/g, "");
+        // Checking data length to define if it is cpf or cnpj
+        if (data.length > 11) {
+          // It's cnpj
+          let cnpj = `${data.substr(0, 2)}.${data.substr(2, 3)}.${data.substr(
+            5,
+            3
+          )}/`;
+          if (data.length > 12) {
+            cnpj += `${data.substr(8, 4)}-${data.substr(12, 2)}`;
+          } else {
+            cnpj += data.substr(8);
+          }
+          data = cnpj;
+        } else {
+          // It's cpf
+          let cpf = "";
+          let parts = Math.ceil(data.length / 3);
+          for (let i = 0; i < parts; i++) {
+            if (i === 3) {
+              cpf += `-${data.substr(i * 3)}`;
+              break;
+            }
+            cpf += `${i !== 0 ? "." : ""}${data.substr(i * 3, 3)}`;
+          }
+          data = cpf;
+        }
+        setcpfCnpjValue(data);
+    };
     return (
         <Container fluid className='homeBkColor'>
             <div className='centered'>
@@ -76,9 +104,9 @@ const Home = () => {
                                 <p className='homeBoldText'>Conecte-se</p>
                                 <p className='homeText mt-50'>CPF/CNPJ</p>
 
-                                <Form.Control type="text" placeholder='CPF/CNPJ' value={cnf} onChange={e=>setCnf(e.target.value)} required/>
+                                <Form.Control type="text" placeholder='CPF/CNPJ' value={cpfCnpj} onChange={(value) => handleCpfCnpjChange(value)} required/>
                                 <Form.Control.Feedback type="invalid">
-                                    Please Provide a valide CPF/CNPJ.
+                                    Forneça um CPF/CNPJ válido.
                                 </Form.Control.Feedback>
                                 <div className='xs-center'>
                                     <Button type="submit" className="submit-btn btn-circle mt-50 mb-50">ENTRAR</Button>
