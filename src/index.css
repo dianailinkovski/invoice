@@ -1,0 +1,18 @@
+@font-face {
+  font-family: "SofiaSansSemiCondensed";
+  src: local("SofiaSansSemiCondensed"),
+   url("./assets//font/SofiaSansSemiCondensed.ttf") format("truetype");
+}
+
+
+body, html {
+  margin: 0;
+  font-family: "SofiaSansSemiCondensed" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
